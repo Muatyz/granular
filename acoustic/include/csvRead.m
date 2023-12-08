@@ -3,8 +3,10 @@ function [tspan, Amp, fspan_half, DFT_half] = csvRead(filename)
 data = readmatrix(filename);
 [Length, ~] = size(data);
 Amp = data(4:Length, 1);
-num = Length - 3;
-Freq = num / 5 * 10^3;
+num = length(Amp);
+Freq = num / 5 * 10^3; % Sampling time is set to be 5 ms
+                       % more acceptable way is to set 2000e3 as sampling
+                       % freq
 % delta_t = 1/Freq;
 
 tspan = (0:num - 1) / Freq;
@@ -20,8 +22,8 @@ fspan = (0:num - 1) * (Freq / num);
 %%% Also remember to use dftRead() function to compare the FFT 
 %%% algorithm.
 
-DFT = abs(fft(Amp));
+DFT = (fft(Amp))*2;
 half_num = floor(num / 2);
-fspan_half = fspan(1:half_num)/10^3; % Here the unit is 1kHz
+fspan_half = fspan(1:half_num);
 DFT_half = DFT(1:half_num);
 end
