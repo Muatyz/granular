@@ -2,7 +2,7 @@ function [tspan, Amp, fspan_half, DFT_half] = csvRead(filename)
 %%% 1. Read the data in the *.csv file
 data = readmatrix(filename);
 [Length, ~] = size(data);
-Amp = data(4:Length, 1);
+Amp = (data(4:Length, 1))';
 num = length(Amp);
 Freq = num / 5 * 10^3; % Sampling time is set to be 5 ms
                        % more acceptable way is to set 2000e3 as sampling
