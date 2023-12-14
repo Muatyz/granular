@@ -78,7 +78,7 @@ xlim([1.7,4])
 %% Test the pulse_method
 
 % [tspan_corrected, Amp_corrected, fspan_corrected, DFT_corrected] = response_correct(Amp_raw,"pulse");
-% response_compare()
+response_compare()
 
 %% Test the band pass filter
 freq_c = 100e3; freq_halfwidth = 5e3;
