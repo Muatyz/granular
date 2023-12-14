@@ -1,4 +1,7 @@
-function [tspan_corrected, Amp_corrected, fspan_corrected, DFT_corrected] = response_correct(Amp_raw, response_type)
+function [tspan_corrected, Amp_corrected, fspan_corrected, DFT_corrected] = response_correct(Amp_raw, response_type, flag_plot)
+%%% response_correct(Amp_raw, response_type, flag_plot)
+%%% Input flag_plot to decide whether plotting the response function.(1 =
+%%% yes, 0 = no)
 
 %%% FFT
 %%% the signal processed in CsvRead() has been cut off so do it
@@ -31,9 +34,13 @@ if response_type == "continuous"
     end
 
     %%% Plot the original response factor function on [1,1000] kHz freq domain
+    if flag_plot == 1
     figure()
     plot(fspan_response/10^3, response_sample), yline(1,"r"),xlabel("Frequency(kHz)"), ylabel("Magnitude")
     legend("response factor(sample)","Y=1")
+    elseif flag_plot == 0
+
+    end
 
 
     %%% Interpolation the response factor function according to 'fspan_raw'
