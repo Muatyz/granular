@@ -81,16 +81,15 @@ xlim([1.7,4])
 % response_compare()
 
 %% Test the band pass filter
-freq_c = 130e3; freq_halfwidth = 5e3;
-freq_low = freq_c - freq_halfwidth; freq_high = freq_c + freq_halfwidth;
-[tspan_filtered, Amp_filtered] = bandpass(tspan_corrected, Amp_corrected, freq_c, freq_halfwidth);
+freq_low = 125e3; freq_high = 135e3;
+[tspan_filtered, Amp_filtered] = bandpass(tspan_corrected, Amp_corrected, freq_low, freq_high);
 
 figure(6)
 subplot(2,1,1)
 plot(tspan_raw*10^3, Amp_raw),xlabel("Time(ms)"),ylabel("Amplitude(V)"),legend("Corrected Signal"),xlim([1.7,3])
 subplot(2,1,2)
-plot(tspan_filtered*10^3, Amp_filtered)
+plot(tspan_filtered*10^3, Amp_filtered),xlabel("Time(ms)"),ylabel("Amplitude(V)");
 hold on
-plot(tspan_filtered*10^3, envelope(abs(Amp_filtered),20,'peak'),'-',"LineWidth",1),xlabel("Time(ms)"),ylabel("Amplitude(V)");
+plot(tspan_filtered*10^3, Amp_filtered)
 hold off
-legend("Band-Pass Filtered Signal(" + freq_low/10^3 + "~" + freq_high/10^3 + " kHz)", "Envelope"),xlim([1.7,3])
+legend("Band Pass Filtered Signal(" + freq_low/10^3 + "~" + freq_high/10^3 + " kHz)"),xlim([1.7,3])

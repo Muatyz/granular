@@ -4,9 +4,9 @@ function [tspan_corrected, Amp_corrected, fspan_corrected, DFT_corrected] = resp
 %%% the signal processed in CsvRead() has been cut off so do it
 %%% independently
 num = length(Amp_raw);
-fs = num/(5*10^(-3));
+fs = 2000e3;
 
-fspan_raw = (0:num - 1) * (fs/num);
+fspan_raw = (0:(num - 1)) * (fs/num);
 dft_raw = fft(Amp_raw);
 
 if response_type == "continuous"
@@ -53,7 +53,7 @@ if response_type == "continuous"
     half_num = floor(num / 2);
     
     fspan_corrected = fspan_raw(1:half_num);
-    DFT_corrected = dft_corrected(1:half_num);
+    DFT_corrected = dft_corrected(1:half_num)*2;
 
 elseif response_type == "pulse"
     [tspan_generator, Amp_generator,fspan_generator, dft_generator] = csvRead("../include/response/pulse_method/generator.csv");

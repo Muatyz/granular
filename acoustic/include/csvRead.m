@@ -4,13 +4,13 @@ data = readmatrix(filename);
 [Length, ~] = size(data);
 Amp = (data(4:Length, 1))';
 num = length(Amp);
-Freq = num / 5 * 10^3; % Sampling time is set to be 5 ms
+Freq = 2000e3; % Sampling time is set to be 5 ms
                        % more acceptable way is to set 2000e3 as sampling
                        % freq
 % delta_t = 1/Freq;
 
-tspan = (0:num - 1) / Freq;
-fspan = (0:num - 1) * (Freq / num);
+tspan = (0:(num - 1)) / Freq;
+fspan = (0:(num - 1)) * (Freq / num);
 
 %%% 2. Draw the time-domain signal
 %%% Please finish this step on your own *.m file!
