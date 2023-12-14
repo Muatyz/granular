@@ -81,16 +81,39 @@ xlim([1.7,4])
 % response_compare()
 
 %% Test the band pass filter
-freq_c = 130e3; freq_halfwidth = 5e3;
+freq_c = 100e3; freq_halfwidth = 5e3;
 freq_low = freq_c - freq_halfwidth; freq_high = freq_c + freq_halfwidth;
-[tspan_filtered, Amp_filtered] = bandpass(tspan_corrected, Amp_corrected, freq_c, freq_halfwidth);
+[tspan_filtered_1, Amp_filtered_1] = bandpass(tspan_corrected, Amp_corrected, freq_c, freq_halfwidth);
+[tspan_filtered_2, Amp_filtered_2] = bandpass(tspan_corrected, Amp_corrected, freq_c*2, freq_halfwidth);
+[tspan_filtered_3, Amp_filtered_3] = bandpass(tspan_corrected, Amp_corrected, freq_c*3, freq_halfwidth);
+
 
 figure(6)
 subplot(2,1,1)
 plot(tspan_raw*10^3, Amp_raw),xlabel("Time(ms)"),ylabel("Amplitude(V)"),legend("Corrected Signal"),xlim([1.7,3])
 subplot(2,1,2)
-plot(tspan_filtered*10^3, Amp_filtered)
+plot(tspan_filtered_1*10^3, Amp_filtered_1)
 hold on
-plot(tspan_filtered*10^3, envelope(abs(Amp_filtered),20,'peak'),'-',"LineWidth",1),xlabel("Time(ms)"),ylabel("Amplitude(V)");
+plot(tspan_filtered_1*10^3, envelope(abs(Amp_filtered_1),20,'peak'),'-',"LineWidth",1),xlabel("Time(ms)"),ylabel("Amplitude(V)");
 hold off
 legend("Band-Pass Filtered Signal(" + freq_low/10^3 + "~" + freq_high/10^3 + " kHz)", "Envelope"),xlim([1.7,3])
+
+figure(7)
+subplot(3,1,1)
+plot(tspan_filtered_1*10^3, Amp_filtered_1)
+hold on
+plot(tspan_filtered_1*10^3, envelope(abs(Amp_filtered_1),20,'peak'),'-',"LineWidth",1),xlabel("Time(ms)"),ylabel("Amplitude(V)");
+hold off
+legend("Band-Pass Filtered Signal(" + freq_low/10^3 + "~" + freq_high/10^3 + " kHz)", "Envelope"),xlim([1.7,3])
+subplot(3,1,2)
+plot(tspan_filtered_2*10^3, Amp_filtered_2)
+hold on
+plot(tspan_filtered_2*10^3, envelope(abs(Amp_filtered_2),20,'peak'),'-',"LineWidth",1),xlabel("Time(ms)"),ylabel("Amplitude(V)");
+hold off
+legend("Band-Pass Filtered Signal(" + (freq_c*2 - freq_halfwidth)/10^3 + "~" + (freq_c*2 + freq_halfwidth)/10^3 + " kHz)", "Envelope"),xlim([1.7,3])
+subplot(3,1,3)
+plot(tspan_filtered_3*10^3, Amp_filtered_3)
+hold on
+plot(tspan_filtered_3*10^3, envelope(abs(Amp_filtered_3),20,'peak'),'-',"LineWidth",1),xlabel("Time(ms)"),ylabel("Amplitude(V)");
+hold off
+legend("Band-Pass Filtered Signal(" + (freq_c*3 - freq_halfwidth)/10^3 + "~" + (freq_c*3 + freq_halfwidth)/10^3 + " kHz)", "Envelope"),xlim([1.7,3])
