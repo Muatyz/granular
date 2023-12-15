@@ -1,4 +1,4 @@
-function [tspan,correlation_coefficient] = correlate(tspan_1,Amp_1, tspan_2, Amp_2)
+function coefficient = correlate(tspan_1,Amp_1, tspan_2, Amp_2)
 %%% Definition of correlation_coefficient
 %%% let's say there's 2 signals $S_{i}$ and $S_{j}$, and we want to 
 %%% calculate the correlation between them. 

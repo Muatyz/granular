@@ -6,7 +6,7 @@ addpath('../include/')
 [tspan_raw, Amp_raw, fspan_raw, dft_raw] = csvRead("小容器-2mm钢珠-36mm-100hz-10vpp-2us-0应力.csv");
 
 %%% Response function correction
-[tspan_corrected, Amp_corrected, fspan_corrected, DFT_corrected] = response_correct(Amp_raw,"continuous");
+[tspan_corrected, Amp_corrected, fspan_corrected, DFT_corrected] = response_correct(Amp_raw,"continuous", 1);
 
 
 %%% High-Pass Filter
