@@ -3,7 +3,8 @@ addpath('../include/')
 
 %%% All freq unit is Hz
 
-[tspan_raw, Amp_raw, fspan_raw, dft_raw] = csvRead("小容器-2mm钢珠-36mm-100hz-10vpp-2us-0应力.csv");
+% [tspan_raw, Amp_raw, fspan_raw, dft_raw] = csvRead("小容器-2mm钢珠-36mm-100hz-10vpp-2us-0应力.csv");
+[tspan_raw, Amp_raw, fspan_raw, dft_raw] = csvRead("5.csv");
 
 %%% Response function correction
 [tspan_corrected, Amp_corrected, fspan_corrected, DFT_corrected] = response_correct(Amp_raw,"continuous", 1);
@@ -34,7 +35,7 @@ plot(tspan_corrected*10^3, Amp_corrected),xlabel("Time(ms)"),ylabel("Amplitude(V
 subplot(3,1,3)
 plot(tspan_corrected*10^3, Amp_corrected_filtered),xlabel("Time(ms)"),ylabel("Amplitude(V)"),legend("Filtered(>" + fc_highpass/10^3 + "kHz)"),xlim([1.7,3])
 
-%%% Freq domain comparison
+%%% Freq domain comparisonx
 figure(2)
 subplot(3,1,1)
 plot(fspan_raw/10^3,abs(dft_raw)),xlabel("Frequency(kHz)"),ylabel("Magnitude(V)"),legend("Original Signal")
