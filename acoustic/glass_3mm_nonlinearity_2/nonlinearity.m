@@ -124,4 +124,10 @@ legend("2_{nd}", "Fit(k = " + slope + ")")
 
 subplot(3,1,3)
 plot(V_input.^3, Amp_harmonic(3,:),'-o'),xlabel("V_{input}^{3}(V^{3})"), ylabel("V_{3\omega}(V)"), legend("3_{rd}")
+
+%%% Add the cut-off index in the similarity figure to compare the 
+%%% reversibility
+
+figure(2)
+xline(V_input(index_cutoff), "r")
 %% Test the band-pass filter
