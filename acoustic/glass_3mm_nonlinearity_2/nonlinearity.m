@@ -1,20 +1,19 @@
 clear;clc;
-addpath('.../include/')
+addpath('../include/')
 %% Preparation
 
 %%% All freq unit is Hz
-num = 10; %% the experiment total number
+num = 20; %% the experiment total number
 fs = 2000e3; T = 5 * 10^(-3); sample_length = fs * T; %% Ideal length. Actually, the sample length could be 9997 or something like this
 freq_c = 100e3; freq_halfwidth = 5e3;
-
 
 %%% Create 0 matrix to restore the vectors
 
 Amp_corrected_m = zeros(num,sample_length);
 Amp_harmonic = zeros(3,num);
-Index_max_amp_1omega = zeros(1:num);
+Index_max_amp_1omega = zeros(1,num);
 
-efficiency = 0.789937; %% the response factor at f_c = 100 kHz
+efficiency = 0.87178; %% the response factor at f_c = 90 kHz
 
 %% Read data
 
@@ -41,9 +40,9 @@ end
 %% Similarity Parameter
 
 %%% calculate the cross-relevant function. Choose the 1st is set to be 1.
-time_window = 1; % The unit is ms
-time_wavefront_amp1 = 1.5; % The unit is ms
-index = zeros(1,10); coefficients_m = zeros(1,10);
+time_window = 1.25; % The unit is ms
+time_wavefront_amp1 = 0.4; % The unit is ms
+index = zeros(1,num); coefficients_m = zeros(1,num);
 
 index(1) = time_wavefront_amp1/10^3 * fs; 
 index_1 = index(1);
@@ -58,34 +57,28 @@ for j = 2 : num
 end
 
 figure(2)
-plot(1:num, coefficients_m,'-o',"LineWidth",1)
-xlabel("V_{input}"), ylabel("Similarity Coefficient")
+plot((1:num)/2, coefficients_m,'-o',"LineWidth",1)
+xlabel("V_{input}(Vpp)"), ylabel("Similarity Coefficient")
 
 %%% Remember find the wavefront first, or you will get compeletly wrong max
 %%% in the signal band-pass filtered
 
 %% Band-pass filter to get each harmonic wave amplitude
 
-waves_m = zeros(num, time_wavefront_amp1 / 10^3 * fs);
-wave_tspan = (0: (time_window /10^3 * fs - 1))/fs; % Unit is Sec
+time_window_length = fs * time_window / 10^3;
+waves_m = zeros(num, time_window_length);
+wave_tspan = (0: (time_window_length - 1))/fs; % Unit is Sec
 for i = 1:num
-    waves_m(i,:) = Amp_corrected_m(i, index(i):(index(i) + time_window /10^3 * fs - 1));
+    waves_m(i,:) = Amp_corrected_m(i, index(i):(index(i) + time_window_length - 1));
 end
 
 for i = 1:num
     %%% band pass around 1omega, 2omega and 3omega
     [tspan_filtered_1, Amp_filtered_1] = bandpass(wave_tspan, waves_m(i,:), freq_c  , freq_halfwidth);
     [tspan_filtered_2, Amp_filtered_2] = bandpass(wave_tspan, waves_m(i,:), freq_c*2, freq_halfwidth);
-    [tspan_filtered_3, Amp_filtered_3] = bandpass(tspan_corrected, Amp_corrected, freq_c*3, freq_halfwidth);
-end
+    [tspan_filtered_3, Amp_filtered_3] = bandpass(wave_tspan, waves_m(i,:), freq_c*3, freq_halfwidth);
 
- %%% band pass around 1omega, 2omega and 3omega
-    [tspan_filtered_1, Amp_filtered_1] = bandpass(tspan_corrected, Amp_corrected, freq_c  , freq_halfwidth);
-    [tspan_filtered_2, Amp_filtered_2] = bandpass(tspan_corrected, Amp_corrected, freq_c*2, freq_halfwidth);
-    [tspan_filtered_3, Amp_filtered_3] = bandpass(tspan_corrected, Amp_corrected, freq_c*3, freq_halfwidth);
-
-    %%% Find the max value index in amp_1omega, and look for value of the
-    %%% corresponding index in amp_2omega and amp_3omega
+    %%% Find the max value in amp_nomega
     [amp_1omega, index_amp_1omega] = max(abs(Amp_filtered_1));
     Amp_harmonic(1, i) = amp_1omega;
     
@@ -94,11 +87,15 @@ end
     
     [amp_3omega, index_amp_3omega] = max(abs(Amp_filtered_3));
     Amp_harmonic(3, i) = amp_3omega;
+end
 
-    %%% Plot the V_input versus V_iomega^i and the corresponding linear-fit
+
+
+
+%%% Plot the V_input versus V_iomega^i and the corresponding linear-fit
 %%% curves
-figure(2)
-V_input = (1:num) * efficiency; degree = 1; 
+figure(3)
+V_input = (1:num) /2 * efficiency; degree = 1; 
 coefficients_m = zeros(3, 2);
 
 subplot(3,1,1)
