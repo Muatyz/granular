@@ -5,7 +5,7 @@ addpath('../include/')
 %%% All freq unit is Hz
 num = 20; %% the experiment total number
 fs = 2000e3; T = 5 * 10^(-3); sample_length = fs * T; %% Ideal length. Actually, the sample length could be 9997 or something like this
-freq_c = 100e3; freq_halfwidth = 5e3;
+freq_c = 90e3; freq_halfwidth = 5e3;
 
 %%% Create 0 matrix to restore the vectors
 
@@ -97,27 +97,31 @@ end
 figure(3)
 V_input = (1:num) /2 * efficiency; degree = 1; 
 coefficients_m = zeros(3, 2);
+index_cutoff = 13;
 
 subplot(3,1,1)
-coefficients_m(1,:) = polyfit(V_input, Amp_harmonic(1,:), degree);
+coefficients_m(1,:) = polyfit(V_input(1:index_cutoff), Amp_harmonic(1,1:index_cutoff), degree);
 slope = coefficients_m(1,1);
-plot(V_input, Amp_harmonic(1,:)) 
+plot(V_input, Amp_harmonic(1,:),'-o') 
 hold on
-plot(V_input, polyval(coefficients_m(1,:), V_input),'r-',"LineWidth",1)
+plot(V_input, polyval(coefficients_m(1,:), V_input),'r--',"LineWidth",1)
+xline(V_input(index_cutoff), "b")
 hold off
 xlabel("V_{input}(V)"), ylabel("V_{1\omega}(V)"),
 legend("Fundamental","Fit(k = " + slope + ")")
 
 subplot(3,1,2)
-coefficients_m(2,:) = polyfit(V_input.^2, Amp_harmonic(2,:), degree);
+V_input_square = V_input.^2;
+coefficients_m(2,:) = polyfit(V_input_square(1:index_cutoff), Amp_harmonic(2,1:index_cutoff), degree);
 slope = coefficients_m(2,1);
-plot(V_input.^2, Amp_harmonic(2,:)),
+plot(V_input_square, Amp_harmonic(2,:),'-o'),
 hold on
-plot(V_input.^2, polyval(coefficients_m(2,:), V_input.^2),'r-',"LineWidth",1)
+plot(V_input_square, polyval(coefficients_m(2,:), V_input.^2),'r--',"LineWidth",1)
+xline(V_input_square(index_cutoff), "b")
 hold off
 xlabel("V_{input}^{2}(V^{2})"), ylabel("V_{2\omega}(V)"), 
 legend("2_{nd}", "Fit(k = " + slope + ")")
 
 subplot(3,1,3)
-plot(V_input.^3, Amp_harmonic(3,:)),xlabel("V_{input}^{3}(V^{3})"), ylabel("V_{3\omega}(V)"), legend("3_{rd}")
+plot(V_input.^3, Amp_harmonic(3,:),'-o'),xlabel("V_{input}^{3}(V^{3})"), ylabel("V_{3\omega}(V)"), legend("3_{rd}")
 %% Test the band-pass filter
