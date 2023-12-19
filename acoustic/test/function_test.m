@@ -118,3 +118,4 @@ hold on
 plot(tspan_filtered_3*10^3, envelope(abs(Amp_filtered_3),20,'peak'),'-',"LineWidth",1),xlabel("Time(ms)"),ylabel("Amplitude(V)");
 hold off
 legend("Band-Pass Filtered Signal(" + (freq_c*3 - freq_halfwidth)/10^3 + "~" + (freq_c*3 + freq_halfwidth)/10^3 + " kHz)", "Envelope"),xlim([1.7,3])
+
