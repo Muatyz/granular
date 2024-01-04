@@ -123,7 +123,9 @@ end
 
 %% Plot the V_input versus V_iomega^i and the corresponding linear-fit curves
 
-V_eff = V_input * efficiency; degree = 1; 
+V_eff = V_input * efficiency; 
+% V_eff = V_input;
+degree = 1; 
 V_window = V_eff(index_start:num); %% **可供分析**的信号对应的输入电压矢量
 fit_effi = zeros(3, 2); %% 用于存储拟合直线的斜率和截距的空白矩阵
 

@@ -143,4 +143,6 @@ xlabel("Time(ms)")
 ylabel("Freq(kHz)")
 
 %% 
-freq_time_heat_map(tspan_corrected, Amp_corrected,fs)
+freq_time_heat_map(Amp_corrected,fs)
+
+
