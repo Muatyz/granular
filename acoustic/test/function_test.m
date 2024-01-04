@@ -144,3 +144,17 @@ ylabel("Freq(kHz)")
 
 %% 
 freq_time_heat_map(tspan_corrected, Amp_corrected,fs)
+
+
+%% Whole Time File Read
+[tspan_all, Amp_all_raw] = csvReadAll("RAEM1_240104211430642.csv");
+
+[tspan_all_c, Amp_all_c, fspan_c, DFT_c] = response_correct(Amp_all_raw,"continuous", 1);
+
+figure()
+subplot(2,1,1)
+plot(tspan_all_c*10^3, Amp_all_c)
+xlabel("Time(ms)"),ylabel("Amplitude");
+subplot(2,1,2)
+plot(fspan_c/10^3, abs(DFT_c))
+xlabel("Freq(kHz)"),ylabel("Magnitude(a.u.)")
