@@ -1,0 +1,173 @@
+clear;clc;
+addpath('../include/')
+
+flag_select = 1;
+
+%% Read the stress-strain(time) data in .csv
+
+sampling_rate_force = 0.0005; %% The unit is second.
+shearing_rate = 10; %% The unit is pps.
+fs_force = 1/sampling_rate_force;
+stress = forceRead("stress-strain.csv", fs_force, 0);
+
+%%% Find index of the first value>0 
+index_start = find(stress>0,1) - 1;
+
+static_time = 11; %% The unit is second
+waste_length = static_time/sampling_rate_force; %% Observe the time length to be wasted
+num = length(stress);
+
+stress = stress(index_start:(num-waste_length));
+num = length(stress);
+
+tspan_f = (0:(num - 1)) / fs_force;
+strain = linspace(0, 20, num); %% The unit is mm
+
+%% Average the Data in Quadratic Method
+window_size = 6;
+ss_quadratic = smooth(stress, fs_force, window_size, "quadratic");
+gamma_test = zeros(1,num) + 0.8;
+
+figure(1)
+%%% stress-strain curve
+t = tiledlayout(1,1);
+ax1 = axes(t);
+plot(ax1, strain, ss_quadratic, '-r')
+ax1.XColor = 'r';
+ax1.YColor = 'r';
+xlabel("Displacement(mm)")
+ylabel("Shear Stress(N)")
+legend("SS-Displacement")
+
+%%% Select a typical area to show the stick-slip event
+if flag_select == 1
+    zp = BaseZoom();
+    zp.plot;
+    %zp.plot;
+end
+
+%%% gamma-time curve
+ax2 = axes(t);
+plot(ax2, tspan_f, gamma_test, '-k')
+ax2.XAxisLocation = 'top';
+ax2.YAxisLocation = 'right';
+ax2.Color = 'none';
+xlabel("Time(s)")
+ylabel("\Gamma_{i,i+1}")
+xlim([0,tspan_f(end)]),ylim([0,1]);
+
+ax1.Box = 'off';
+ax2.Box = 'off';
+
+legend("Time-\Gamma")
+
+% yyaxis left
+% plot(tspan_f, ss_quadratic)
+% xlabel("Time(s)"),ylabel("Shear Stress(N)");
+% 
+% yyaxis right
+% gamma_test = zeros(1,num) + 0.8;
+% plot(tspan_f, gamma_test)
+% ylabel("\Gamma_{i,i+1}"),ylim([0,1])
+% legend("Quadratic Averaged SS", "\Gamma_{i,i+1}")
+
+%% Count the Stick-Slip Event and Tag the Data
+%%% tag = 0: stick; tag = 1: slip;
+%%% index 比 单纯的时间/位移值好用
+
+tag = 0; %% reset the status to `stick`
+
+%%% record the start and end index of the slip event
+slip_index_start = []; 
+slip_index_end = []; 
+slip_events = [ ; ]; %% Record: 1. SS drop; 2. occurrance time
+
+
+for i = 2:num
+    if ss_quadratic(i - 1) <= ss_quadratic(i) && tag == 0
+        %%% stick 继续发展
+        %%%             i
+        %%%         i-1
+        %%%     o
+        %%% o
+        tag = 0;
+        
+
+    elseif ss_quadratic(i - 1) > ss_quadratic(i) && tag == 0
+        %%% stick 事件结束, 进入 slip 状态
+        %%%         i-1
+        %%%     o
+        %%% o
+        %%%             i
+        tag = 1;
+        slip_index_start(end+1) = i - 1;
+        
+    elseif ss_quadratic(i - 1) >= ss_quadratic(i) && tag == 1
+        %%% slip 继续发展
+        %%% o
+        %%%     o
+        %%%         i-1
+        %%%             i
+        tag = 1;
+
+    else
+        %%% ss_quadratic(i - 1) < ss_quadratic(i) && tag == 1
+        %%% slip 事件结束.
+        %%% o
+        %%%     o
+        %%%             i
+        %%%         i-1
+        tag = 0; %% 转为 stick 状态
+        slip_index_end(end+1) = i - 1;
+        
+        %%% 根据 index 寄存器计算并且存储该次 slip 事件的参数
+        ss_drop = ss_quadratic(slip_index_start(end)) - ss_quadratic(slip_index_end(end));
+        slip_tick = tspan_f(slip_index_start(end));
+
+        slip_events(:,end+1) = [ss_drop;slip_tick];
+    end
+end
+
+%% Plot the histogram to observe the distribution of slip events
+
+figure(2)
+nbins = 10^4;
+histogram(slip_events(1,:),nbins,'DisplayStyle','stairs')
+set(gca,'yscale','log')
+xlabel("Shear Stress Drop(N)"),xlim([0,max(slip_events(1,:))+0.1])
+ylabel("log N_{occurrence}")
+title("Histogram of Slip Events")
+
+
+%% Plot the slip event on time-domain
+
+figure(3)
+plot(slip_events(2,:),slip_events(1,:))
+xlabel("Time(s)"),ylabel("Shear Stress Drop")
+xlim([0,max(slip_events(2,:))])
+
+%% classify the slip events according to the histogram
+threshoud = [0.2, 0.4];
+type = slip_classify(ss_drop, ss_drop, "ssDrop",threshoud);
+
+%%% Calculate the time preceding the failure(s) of micro-slips
+
+failure_tick = [];
+micro_slip_tick = [];
+
+slip_tick = slip_events(2,:);
+
+%%% 记录各 failure 的时间和各 micro-slip 的时间
+for j = 1:length(slip_tick)
+    if type(j) == 2 %% 若类型为 major-slip
+        failure_tick(end+1) = slip_tick(j);
+    elseif type(j) == 0 %% 若类型为 micro-slip
+        
+    end
+
+end
+
+%%% 根据得到的 micro-slip 和 failure 时刻表计算 pre-interval
+%%% 使用累计 micro-slip 数 预测 failure 在多久后可能发生
+
+micro_slip_pre_interval = [];

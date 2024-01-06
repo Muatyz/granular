@@ -158,3 +158,77 @@ xlabel("Time(ms)"),ylabel("Amplitude");
 subplot(2,1,2)
 plot(fspan_c/10^3, abs(DFT_c))
 xlabel("Freq(kHz)"),ylabel("Magnitude(a.u.)")
+
+%% 调制高斯型的正弦波包
+
+f = 150e3; %% the unit is Hz
+n_cycle = 10; 
+fs = 2000e3;
+delta_t = 1/fs;
+
+%%% Define the parameters of the guassian function
+mu = n_cycle/2/f;
+sigma = 0.00001; 
+%%% generate the curve
+t = 0:delta_t:(n_cycle/f);
+l = length(t);
+gs = 1/(sigma*sqrt(2*pi)) * exp(-(t-mu).^2/(2*sigma^2));
+s = sin(2*pi*f*t) .* gs;
+
+fspan = (0:(l - 1)) * (fs/l);
+dft = (fft(s))*2;
+half_l = floor(l/2);
+fspan_half = fspan(1:half_l);
+dft_half = dft(1:half_l);
+
+%%% plot the curve
+figure()
+subplot(2,1,1)
+plot(t*10^3, s,t*10^3, gs, t*10^3, envelope(abs(s),10,'peak'),'-',"LineWidth",1)
+xlabel("Time(ms)"),ylabel("Magnitude(a.u.)")
+legend("\mu="+mu+",\sigma="+sigma,"Guassian Function","Envelope")
+
+subplot(2,1,2)
+plot(fspan_half/10^3, abs(dft_half))
+xlabel("Frequency(kHz)"),ylabel("Magnitude(a.u.)")
+legend("Modulated Siganl DFT")
+
+%% Stress-Strain curve
+sampling_rate_force = 0.0005; %% The unit is second.
+shearing_rate = 10;
+fs_force = 1/sampling_rate_force;
+stress = forceRead("stress-strain.csv", fs_force, 0);
+num = length(stress);
+
+tspan_f = (0:(num - 1)) / fs_force;
+
+%%% weight-average method to smooth the data
+ss_line = smooth(stress, fs_force, 6, "line");
+ss_quadratic = smooth(stress, fs_force, 6, "quadratic");
+
+figure()
+subplot(3,1,1)
+plot(tspan_f, stress)
+xlabel("Time(s)"),ylabel("Shear Stress(N)");
+legend("Raw Signal at Shearing Rate = "+ shearing_rate +" pps")
+
+subplot(3,1,2)
+plot(tspan_f, ss_line)
+xlabel("Time(s)"),ylabel("Shear Stress(N)");
+legend("Line-Smoothed Signal at Shearing Rate = "+ shearing_rate +" pps")
+
+subplot(3,1,3)
+plot(tspan_f, ss_quadratic)
+xlabel("Time(s)"),ylabel("Shear Stress(N)");
+legend("Quadratic-Smoothed Signal at Shearing Rate = "+ shearing_rate +" pps")
+%%% Plot the two curves on the same figure and Zoom it 
+
+figure()
+plot(tspan_f, stress, tspan_f, ss_line,tspan_f,ss_quadratic,'--')
+xlabel("Time(s)"),ylabel("Shear Stress(N)");
+legend("Raw", "Line Averaged", "Quadratic Averaged")
+
+%%% Add a zoomed zone
+%%% note: `Image Processing Toolbox` required
+zp = BaseZoom();
+zp.plot;
