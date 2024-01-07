@@ -232,3 +232,17 @@ legend("Raw", "Line Averaged", "Quadratic Averaged")
 %%% note: `Image Processing Toolbox` required
 zp = BaseZoom();
 zp.plot;
+
+%% super-huge data reading
+%%% 尝试录制 10s 的数据, 观察是否可以完成
+%%% .txt 文件是比 .csv 文件更高效完成数据存储的格式
+clear;clc;
+addpath('../include/')
+
+filename = '10_sec.txt';
+[tspan, Amp_raw] = swaeTxtRead(filename);
+
+figure()
+plot(tspan, Amp_raw),xlabel("Time(s)"),ylabel("Amplitude(V)");
+xlim([min(tspan),max(tspan)])
+legend("Test Signal")
