@@ -6,14 +6,15 @@ flag_select = 1;
 %% Read the stress-strain(time) data in .csv
 
 sampling_rate_force = 0.0005; %% The unit is second.
-shearing_rate = 10; %% The unit is pps.
+shearing_rate = 20; %% The unit is pps.
 fs_force = 1/sampling_rate_force;
-stress = forceRead("stress-strain.csv", fs_force, 0);
+stress = forceRead("stress-strain-5cm.csv", fs_force, 0);
 
 %%% Find index of the first value>0 
-index_start = find(stress>0,1) - 1;
+index_head = find(stress==0.1);
+index_start = index_head(end) - 1;
 
-static_time = 11; %% The unit is second
+static_time = 0; %% The unit is second
 waste_length = static_time/sampling_rate_force; %% Observe the time length to be wasted
 num = length(stress);
 
@@ -21,7 +22,7 @@ stress = stress(index_start:(num-waste_length));
 num = length(stress);
 
 tspan_f = (0:(num - 1)) / fs_force;
-strain = linspace(0, 20, num); %% The unit is mm
+strain = linspace(0, 50, num); %% The unit is mm
 
 %% Average the Data in Quadratic Method
 window_size = 6;

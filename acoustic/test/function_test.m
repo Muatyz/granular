@@ -234,13 +234,13 @@ zp = BaseZoom();
 zp.plot;
 
 %% super-huge data reading
-%%% 尝试录制 10s 的数据, 观察是否可以完成
+%%% 尝试录制 100s 的数据, 观察是否可以完成
 %%% .txt 文件是比 .csv 文件更高效完成数据存储的格式
 clear;clc;
 addpath('../include/')
 
-filename = '10_sec.txt';
-[tspan, Amp_raw] = swaeTxtRead(filename);
+% filepath = '/';
+[tspan, Amp_raw] = swaeTxtRead();
 
 figure()
 plot(tspan, Amp_raw),xlabel("Time(s)"),ylabel("Amplitude(V)");

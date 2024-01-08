@@ -1,0 +1,11 @@
+function [tspan, Amp_raw] = swaeTxtRead(filepath, )
+filename_list = dir('CH01_Data_*.txt');
+data 
+
+data = readmatrix(filename);
+fs = 2000e3;
+[Length,~] = size(data);
+
+Amp_raw = data;
+tspan = (0:(Length - 1))/fs;
+end
